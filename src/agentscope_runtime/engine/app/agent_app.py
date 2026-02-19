@@ -616,12 +616,16 @@ class AgentApp(FastAPI, UnifiedRoutingMixin, InterruptMixin):
             if isinstance(param.default, DependsClass):
                 new_params.append(param)
 
-        agent_api.__signature__ = full_sig.replace(parameters=new_params)
+        agent_api.__signature__ = full_sig.replace(
+            parameters=new_params,
+            return_annotation=StreamingResponse,
+        )
         agent_api.__name__ = user_func.__name__
         agent_api.__doc__ = user_func.__doc__
 
         self.post(
             self.endpoint_path,
+            response_model=None,
             openapi_extra={
                 "requestBody": {
                     "content": {
